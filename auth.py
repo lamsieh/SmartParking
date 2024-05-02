@@ -99,3 +99,32 @@ def create_admin():
         return 'Admin user created successfully.'
     else:
         return error, 400
+
+
+@bp.route('/members')
+def members():
+    # Rendre le template HTML pour la page "members.html" dans le dossier "dashboard"
+    return render_template('dashboard/members.html')
+
+
+@bp.route('/guests')
+def guests():
+    # Rendre le template HTML pour la page "guests.html" dans le dossier "dashboard"
+    return render_template('dashboard/guests.html')
+
+
+@bp.route('/parking')
+def parking():
+    # Rendre le template HTML pour la page "parking.html" dans le dossier "dashboard"
+    return render_template('dashboard/parking.html')
+
+
+@bp.route('/tarifs')
+def tarifs():
+    # Rendre le template HTML pour la page "tarifs.html" dans le dossier "dashboard"
+    return render_template('dashboard/tarifs.html')
+
+@bp.route('/camera')
+def camera():
+    # Rendre le template HTML pour la page "camera.html" dans le dossier "dashboard"
+    return render_template('dashboard/camera.html')

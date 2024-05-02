@@ -252,22 +252,136 @@ const areaChart = new ApexCharts(
 );
 areaChart.render();
 
+
 document.addEventListener("DOMContentLoaded", function () {
-  // Écoute des clics sur le lien 'Members'
-  document.getElementById('loadMembers').addEventListener('click', function (e) {
+
+  document.getElementById('membersLink').addEventListener('click', function (e) {
     e.preventDefault();
-    // Met à jour le contenu du main-container avec le contenu pour 'Members'
-    // Supposons que vous avez un div avec id 'membersContent' contenant le contenu de 'members.html'
-    var membersContent = document.getElementById('membersContent').innerHTML;
-    document.getElementById('main-container').innerHTML = membersContent;
+    loadMembersContent();
   });
 
-  // Écoute des clics sur le lien 'Dashboard'
-  document.getElementById('dashboardLink').addEventListener('click', function (e) {
+  document.getElementById('guestsLink').addEventListener('click', function (e) {
     e.preventDefault();
-    // Met à jour le contenu du main-container avec le contenu pour 'Dashboard'
-    document.getElementById('main-container').innerHTML = '<h1>Welcome to the Dashboard</h1>';
-    // Vous pouvez ajouter plus de contenu de dashboard ici si nécessaire
+    loadGuestsContent();
   });
+
+  document.getElementById('parkingLink').addEventListener('click', function (e) {
+    e.preventDefault();
+    loadParkingContent();
+  });
+
+  document.getElementById('tarifsLink').addEventListener('click', function (e) {
+    e.preventDefault();
+    loadTarifsContent();
+  });
+
+  document.getElementById('cameraLink').addEventListener('click', function (e) {
+    e.preventDefault();
+    loadCameraContent();
+  });
+
+
 });
+
+function loadMembersContent() {
+  fetch('/auth/members')
+    .then(response => response.text())
+    .then(data => {
+      document.getElementById('main-container').innerHTML = data;
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+function loadGuestsContent() {
+  fetch('/auth/guests')
+    .then(response => response.text())
+    .then((data) => {
+      document.getElementById('main-container').innerHTML = data;
+    })
+    .catch((error) => {
+      console.error('Error:', error);
+    });
+}
+
+function loadParkingContent() {
+  fetch('/auth/parking')
+    .then(response => response.text())
+    .then((data) => {
+      document.getElementById('main-container').innerHTML = data;
+    })
+    .catch((error) => {
+      console.error('Error:', error);
+    });
+
+}
+
+function loadTarifsContent() {
+  fetch('/auth/tarifs')
+    .then(response => response.text())
+    .then((data) => {
+      document.getElementById('main-container').innerHTML = data;
+    })
+    .catch((error) => {
+      console.error('Error:', error);
+    });
+
+}
+
+function loadCameraContent() {
+  fetch('/auth/camera')
+    .then(response => response.text())
+    .then((data) => {
+      document.getElementById('main-container').innerHTML = data;
+    })
+    .catch((error) => {
+      console.error('Error:', error);
+    });
+
+
+}
+
+function openModal() {
+  var modal = document.getElementById("myModal");
+  modal.style.display = "block";
+}
+
+function closeModal() {
+  var modal = document.getElementById("myModal");
+  modal.style.display = "none";
+}
+
+// Fonction pour ouvrir le modal d'édition et pré-remplir les champs avec les valeurs du membre sélectionné
+function openEditModal(rowIndex) {
+  // Récupérer les valeurs du membre à partir du tableau
+  // var rowData = /* Code pour récupérer les valeurs du tableau en fonction de l'index de ligne (rowIndex) */
+
+  // // Pré-remplir les champs du formulaire avec les valeurs du membre
+  // document.getElementById("editFirstName").value = rowData.firstName;
+  // document.getElementById("editLastName").value = rowData.lastName;
+  // document.getElementById("editPhone").value = rowData.phone;
+  // document.getElementById("editEmail").value = rowData.email;
+  // document.getElementById("editIsPayed").value = rowData.isPayed;
+
+  // // Stocker l'index de ligne dans un champ caché pour référence ultérieure
+  // document.getElementById("editRowIndex").value = rowIndex;
+
+  // Ouvrir le modal d'édition
+  document.getElementById("editModal").style.display = "block";
+}
+
+
+function closeEditModal() {
+  document.getElementById("editModal").style.display = "none";
+}
+
+
+
+
+
+
+
+
+
+
+
 
