@@ -1,0 +1,361 @@
+<style>
+  /* Style for the member table */
+  .member-table {
+    width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+  }
+
+  .member-table th,
+  .member-table td {
+    padding: 8px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+
+  .member-table th {
+    background-color: #263043;
+  }
+
+  .member-table tr:nth-child(even) {
+    background-color: #263043;
+  }
+
+  /* Style for the buttons */
+  .edit-btn,
+  .delete-btn {
+    padding: 5px;
+    margin-right: 5px;
+    border: none;
+    border-radius: 3px;
+    background-color: transparent;
+    font-size: 16px;
+    cursor: pointer;
+    transition: color 0.3s;
+  }
+  .edit-btn {
+    color: #4caf50;
+  }
+  .delete-btn {
+    color: #f44336;
+  }
+
+  .edit-btn:hover {
+    background-color: #fff;
+    color: #4caf50;
+  }
+
+  .delete-btn:hover {
+    background-color: #fff;
+    color: #f44336;
+  }
+  /* Style for the create button */
+  .create-btn {
+    margin-bottom: 10px;
+    padding: 10px 20px;
+    border: none;
+    float: right;
+    border-radius: 5px;
+    background-color: #0936f9;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  .create-btn:hover {
+    background-color: #fff;
+    color: #0936f9;
+  }
+  /* Style for the modal */
+  /* Style for the modal */
+  .modal {
+    display: none; /* Cache le modal par défaut */
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4);
+  }
+
+  /* Style for le contenu du modal */
+  .modal-content {
+    background-color: #263043;
+    margin: auto; /* Pour centrer horizontalement */
+    margin-top: 10vh; /* Pour centrer verticalement */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 500px;
+  }
+
+  /* Style for le bouton de fermeture */
+  .close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+  }
+
+  .close:hover,
+  .close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  /* Style pour le formulaire du modal */
+  .modal-content form {
+    display: flex;
+    flex-direction: column; /* Permet le retour à la ligne des éléments flexibles */
+  }
+
+  /* Style pour les labels des inputs */
+  .modal-content form label {
+    width: 200px;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+  }
+
+  /* Style pour les inputs dans le formulaire du modal */
+  .modal-content form input {
+    width: 200px;
+    margin-bottom: 10px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    transition: border-color 0.3s;
+  }
+
+  /* Style pour les inputs lorsqu'ils sont en focus */
+  .modal-content form input:focus {
+    outline: none;
+    border-color: #0936f9;
+  }
+  /* Style pour les selects dans le formulaire du modal */
+  .modal-content form select {
+    width: 70%; /* Largeur fixe suffisamment grande */
+    margin-bottom: 10px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    transition: border-color 0.3s;
+  }
+
+  /* Style pour les selects lorsqu'ils sont en focus */
+  .modal-content form select:focus {
+    outline: none;
+    border-color: #0936f9;
+  }
+
+  /* Style pour les boutons du formulaire */
+  .modal-content form button[type="submit"] {
+    margin: 15px auto; /* Centre le bouton horizontalement */
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+
+  .modal-content form .create-member {
+    background-color: #0936f9;
+    color: #fff;
+  }
+
+  .modal-content form .create-member:hover {
+    background-color: #fff;
+    color: #0936f9;
+  }
+
+  .modal-content form .edit-member {
+    background-color: #4caf50;
+    color: #fff;
+  }
+
+  .modal-content form .edit-member:hover {
+    background-color: #fff;
+    color: #4caf50;
+  }
+  .form-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+
+  .form-group {
+    flex-basis: calc(50% - 10px);
+  }
+
+  /* Pour les petites résolutions, utilisez un affichage en colonne */
+  @media (max-width: 768px) {
+    .form-row {
+      flex-direction: column;
+    }
+
+    .form-group {
+      flex-basis: auto;
+      margin-bottom: 10px;
+    }
+  }
+</style>
+
+<main>
+  <div class="main-title">
+    <h2>Members</h2>
+  </div>
+
+  <!-- Add member button -->
+  <button class="create-btn" onclick="openModal()">Add Member</button>
+
+  <!-- Modal -->
+  <div id="myModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <h2>Create New Member</h2>
+      <!-- Form to create a new member -->
+      <form>
+        <div class="form-row">
+          <!-- Première ligne -->
+          <div class="form-group">
+            <label for="firstName">First Name:</label>
+            <input type="text" id="firstName" name="firstName" />
+          </div>
+          <div class="form-group">
+            <label for="lastName">Last Name:</label>
+            <input type="text" id="lastName" name="lastName" />
+          </div>
+        </div>
+        <div class="form-row">
+          <!-- Deuxième ligne -->
+          <div class="form-group">
+            <label for="phone">Phone:</label>
+            <input type="text" id="phone" name="phone" />
+          </div>
+          <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" />
+          </div>
+        </div>
+        <div class="form-row">
+          <!-- Troisième ligne -->
+          <div class="form-group">
+            <label for="matricule">Matricule:</label>
+            <input type="text" id="matricule" name="matricule" />
+          </div>
+          <div class="form-group">
+            <label for="isPayed">Is Payed:</label>
+            <select id="isPayed" name="isPayed">
+              <option value="yes">Yes</option>
+              <option value="no">No</option>
+            </select>
+          </div>
+        </div>
+        <!-- Button to submit the form -->
+        <button type="submit" class="create-member">Create Member</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div id="editModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeEditModal()">&times;</span>
+      <h2>Edit Member</h2>
+      <!-- Form to edit member details -->
+      <form id="editForm">
+        <!-- Form fields for member details -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="editFirstName">First Name:</label>
+            <input type="text" id="editFirstName" name="editFirstName" />
+          </div>
+          <div class="form-group">
+            <label for="editLastName">Last Name:</label>
+            <input type="text" id="editLastName" name="editLastName" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="editPhone">Phone:</label>
+            <input type="text" id="editPhone" name="editPhone" />
+          </div>
+          <div class="form-group">
+            <label for="editEmail">Email:</label>
+            <input type="email" id="editEmail" name="editEmail" />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="editMatricule">Matricule:</label>
+            <input type="text" id="editMatricule" name="editMatricule" />
+          </div>
+          <div class="form-group">
+            <label for="editIsPayed">Is Payed:</label>
+            <select id="editIsPayed" name="editIsPayed">
+              <option value="yes">Yes</option>
+              <option value="no">No</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Hidden input to store the index of the edited row -->
+        <input type="hidden" id="editRowIndex" name="editRowIndex" />
+
+        <!-- Button to submit the form -->
+        <button type="submit" class="edit-member">Edit Member</button>
+      </form>
+    </div>
+  </div>
+
+  <table class="member-table">
+    <thead>
+      <tr>
+        <th>RFID</th>
+        <th>FirstName</th>
+        <th>LastName</th>
+        <th>Phone</th>
+        <th>Email</th>
+        <th>Matricule</th>
+        <th>isPayed</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Example data -->
+      <tr>
+        <td>123456789</td>
+        <td>John</td>
+        <td>Doe</td>
+        <td>123-456-7890</td>
+        <td>john@example.com</td>
+        <td>123456</td>
+        <td>Yes</td>
+        <td>
+          <button class="edit-btn">
+            <i class="fas fa-edit" onclick="openEditModal()"></i>
+          </button>
+          <button class="delete-btn"><i class="fas fa-trash-alt"></i></button>
+        </td>
+      </tr>
+      <tr>
+        <td>987654321</td>
+        <td>Jane</td>
+        <td>Smith</td>
+        <td>987-654-3210</td>
+        <td>jane@example.com</td>
+        <td>987654</td>
+        <td>No</td>
+        <td>
+          <button class="edit-btn">
+            <i class="fas fa-edit" onclick="openEditModal()"></i>
+          </button>
+          <button class="delete-btn"><i class="fas fa-trash-alt"></i></button>
+        </td>
+      </tr>
+      <!-- Add more rows as needed -->
+    </tbody>
+  </table>
+</main>
