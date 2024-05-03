@@ -188,48 +188,13 @@
     <h2>Session Parking</h2>
   </div>
 
-  <!-- Modal -->
-  <div id="editModal" class="modal">
-    <div class="modal-content">
-      <span class="close" onclick="closeEditModal()">&times;</span>
-      <h2>Edit Parking</h2>
-      <form id="editForm">
-        <div class="form-row">
-          <div class="form-group">
-            <label for="editEstVide">Est Vide?:</label>
-            <select id="editEstVide" name="editEstVide">
-              <option value="yes">Yes</option>
-              <option value="no">No</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="editMatricule">Matricule:</label>
-            <input type="text" id="editMatricule" name="editMatricule" />
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label for="editDateEntree">Date Entrée:</label>
-            <input type="date" id="editDateEntree" name="editDateEntree" />
-          </div>
-        </div>
-
-        <!-- Hidden input to store the index of the edited row -->
-        <input type="hidden" id="editRowIndex" name="editRowIndex" />
-
-        <button type="submit" class="edit-parking">Edit Parking</button>
-      </form>
-    </div>
-  </div>
-
   <table class="member-table">
     <thead>
       <tr>
         <th>Place</th>
-        <th>Est Vide?</th>
-        <th>Matricule</th>
-        <th>Date Entrée</th>
-        <th>Actions</th>
+        <th>isEmpty?</th>
+        <th>LicensePlate</th>
+        <th>EntryDate</th>
       </tr>
     </thead>
     <tbody>
@@ -239,48 +204,24 @@
         <td>oui</td>
         <td>----</td>
         <td>----</td>
-        <td>
-          <button class="edit-btn">
-            <i class="fas fa-edit" onclick="openEditModal()"></i>
-          </button>
-          <button class="delete-btn"><i class="fas fa-trash-alt"></i></button>
-        </td>
       </tr>
       <tr>
         <td>b</td>
         <td>non</td>
         <td>1234</td>
         <td>02/05/2024</td>
-        <td>
-          <button class="edit-btn">
-            <i class="fas fa-edit" onclick="openEditModal()"></i>
-          </button>
-          <button class="delete-btn"><i class="fas fa-trash-alt"></i></button>
-        </td>
       </tr>
       <tr>
         <td>c</td>
         <td>non</td>
         <td>5678</td>
         <td>02/05/2024</td>
-        <td>
-          <button class="edit-btn">
-            <i class="fas fa-edit" onclick="openEditModal()"></i>
-          </button>
-          <button class="delete-btn"><i class="fas fa-trash-alt"></i></button>
-        </td>
       </tr>
       <tr>
         <td>d</td>
         <td>oui</td>
         <td>----</td>
         <td>----</td>
-        <td>
-          <button class="edit-btn">
-            <i class="fas fa-edit" onclick="openEditModal()"></i>
-          </button>
-          <button class="delete-btn"><i class="fas fa-trash-alt"></i></button>
-        </td>
       </tr>
     </tbody>
   </table>

@@ -215,46 +215,58 @@
       <span class="close" onclick="closeModal()">&times;</span>
       <h2>Create New Member</h2>
       <!-- Form to create a new member -->
-      <form>
-        <div class="form-row">
-          <!-- Première ligne -->
-          <div class="form-group">
-            <label for="firstName">First Name:</label>
-            <input type="text" id="firstName" name="firstName" />
-          </div>
-          <div class="form-group">
-            <label for="lastName">Last Name:</label>
-            <input type="text" id="lastName" name="lastName" />
-          </div>
-        </div>
-        <div class="form-row">
-          <!-- Deuxième ligne -->
-          <div class="form-group">
-            <label for="phone">Phone:</label>
-            <input type="text" id="phone" name="phone" />
-          </div>
-          <div class="form-group">
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" />
-          </div>
-        </div>
-        <div class="form-row">
-          <!-- Troisième ligne -->
-          <div class="form-group">
-            <label for="matricule">Matricule:</label>
-            <input type="text" id="matricule" name="matricule" />
-          </div>
-          <div class="form-group">
-            <label for="isPayed">Is Payed:</label>
-            <select id="isPayed" name="isPayed">
-              <option value="yes">Yes</option>
-              <option value="no">No</option>
-            </select>
-          </div>
-        </div>
-        <!-- Button to submit the form -->
-        <button type="submit" class="create-member">Create Member</button>
-      </form>
+     <!-- Form to create a new member -->
+<form id="createMemberForm" action="{{ url_for('auth.create_member') }}" method="POST">
+  <div class="form-row">
+    <!-- Première ligne -->
+    <div class="form-group">
+      <label for="firstName">First Name:</label>
+      <input type="text" id="firstName" name="firstName" />
+    </div>
+    <div class="form-group">
+      <label for="lastName">Last Name:</label>
+      <input type="text" id="lastName" name="lastName" />
+    </div>
+  </div>
+  <div class="form-row">
+    <!-- Deuxième ligne -->
+    <div class="form-group">
+      <label for="phone">Phone:</label>
+      <input type="text" id="phone" name="phone" />
+    </div>
+    <div class="form-group">
+      <label for="email">Email:</label>
+      <input type="email" id="email" name="email" />
+    </div>
+  </div>
+  <div class="form-row">
+    <!-- Troisième ligne -->
+    <div class="form-group">
+      <label for="matricule1">Matricule 1:</label>
+      <input type="text" id="matricule1" name="matricule[]" />
+    </div>
+    <div class="form-group">
+      <label for="matricule2">Matricule 2:</label>
+      <input type="text" id="matricule2" name="matricule[]" />
+    </div>
+  </div>
+  <div class="form-row">
+      <div class="form-group">
+      <label for="matricule3">Matricule 3:</label>
+      <input type="text" id="matricule3" name="matricule[]" />
+    </div>
+    <div class="form-group">
+      <label for="isPayed">Is Payed:</label>
+      <select id="isPayed" name="isPayed">
+        <option value="yes">Yes</option>
+        <option value="no">No</option>
+      </select>
+    </div>
+  </div>
+  <!-- Button to submit the form -->
+  <button type="submit" class="create-member">Create Member</button>
+</form>
+
     </div>
   </div>
 
@@ -313,49 +325,32 @@
   <table class="member-table">
     <thead>
       <tr>
-        <th>RFID</th>
         <th>FirstName</th>
         <th>LastName</th>
         <th>Phone</th>
         <th>Email</th>
-        <th>Matricule</th>
+        <th>LicensePlate</th>
         <th>isPayed</th>
         <th>Actions</th>
       </tr>
     </thead>
-    <tbody>
-      <!-- Example data -->
-      <tr>
-        <td>123456789</td>
-        <td>John</td>
-        <td>Doe</td>
-        <td>123-456-7890</td>
-        <td>john@example.com</td>
-        <td>123456</td>
-        <td>Yes</td>
-        <td>
-          <button class="edit-btn">
-            <i class="fas fa-edit" onclick="openEditModal()"></i>
-          </button>
-          <button class="delete-btn"><i class="fas fa-trash-alt"></i></button>
-        </td>
-      </tr>
-      <tr>
-        <td>987654321</td>
-        <td>Jane</td>
-        <td>Smith</td>
-        <td>987-654-3210</td>
-        <td>jane@example.com</td>
-        <td>987654</td>
-        <td>No</td>
-        <td>
-          <button class="edit-btn">
-            <i class="fas fa-edit" onclick="openEditModal()"></i>
-          </button>
-          <button class="delete-btn"><i class="fas fa-trash-alt"></i></button>
-        </td>
-      </tr>
-      <!-- Add more rows as needed -->
-    </tbody>
+<tbody>
+  {% for member in members %}
+  <tr>
+    <td>{{ member.FirstName }}</td>
+    <td>{{ member.LastName }}</td>
+    <td>{{ member.Phone }}</td>
+    <td>{{ member.Email }}</td>
+    <td>{{ member.LicensePlate }}</td>
+    <td>{{ member.isPayed }}</td>
+    <td>
+      <button class="edit-btn">
+        <i class="fas fa-edit" onclick="openEditModal()"></i>
+      </button>
+      <button class="delete-btn"><i class="fas fa-trash-alt"></i></button>
+    </td>
+  </tr>
+  {% endfor %}
+</tbody>
   </table>
 </main>

@@ -15,7 +15,6 @@ CREATE TABLE User (
 
 CREATE TABLE Member (
   ID INTEGER PRIMARY KEY AUTOINCREMENT,
-  RFID TEXT UNIQUE NOT NULL,
   LastName TEXT NOT NULL,
   FirstName TEXT NOT NULL,
   Phone TEXT NOT NULL,
@@ -26,7 +25,8 @@ CREATE TABLE Member (
 
 CREATE TABLE Guest (
   ID INTEGER PRIMARY KEY AUTOINCREMENT,
-  Code TEXT NOT NULL
+  Code TEXT NOT NULL,
+  PriceToPay DECIMAL(5,2)
 );
 
 
@@ -44,15 +44,15 @@ CREATE TABLE LicensePlate (
 
 CREATE TABLE Rates (
   ID INTEGER PRIMARY KEY AUTOINCREMENT,
-  Duration INTEGER NOT NULL,  -- Durée en minutes
-  Price DECIMAL(5,2) NOT NULL -- Prix en devise locale
+  Duration INTEGER NOT NULL,
+  Price DECIMAL(5,2) NOT NULL
 );
 
 
 CREATE TABLE Parking (
-  PlaceID TEXT PRIMARY KEY,    -- Identifiants 'a', 'b', 'c', 'd' pour les places
+  PlaceID TEXT PRIMARY KEY,
   isEmpty BOOLEAN NOT NULL,    -- True si la place est vide, False sinon
-  LicensePlateID INTEGER,      -- Optionnel, ID de la plaque si la place est occupée
+  LicensePlateID INTEGER,
   FOREIGN KEY (LicensePlateID) REFERENCES LicensePlate(ID)
 );
 
