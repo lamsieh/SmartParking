@@ -9,30 +9,38 @@ from .db import get_db
 bp = Blueprint('auth', __name__, url_prefix='/auth')
 
 
+
+
+
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        # Changed to lowercase to match HTML form
-        username = request.form['username']
-        password = request.form['password']
+        print(request.form)
+        # Utilisez 'get' pour éviter les exceptions KeyError
+        username = request.form.get('username')
+        password = request.form.get('password')
+
+        if not username or not password:
+            # Gérez l'erreur si les données requises ne sont pas fournies
+            flash('Username and password are required.')
+            return render_template('auth/login.html'), 400  # Ajoutez un code de statut HTTP pour clarifier l'erreur
+
         db = get_db()
-        error = None
         user = db.execute(
             'SELECT * FROM User WHERE Username = ?', (username,)
         ).fetchone()
 
         if user is None:
-            error = 'Incorrect username.'
-        elif not check_password_hash(user['Password'], password):
-            error = 'Incorrect password.'
+            flash('Incorrect username.')
+            return render_template('auth/login.html'), 404  # Utilisateur non trouvé
 
-        if error is None:
-            session.clear()
-            session['UserID'] = user['ID']
-            # Redirect to a route, not a template
-            return redirect(url_for('auth.dashboard'))
+        if not check_password_hash(user['Password'], password):
+            flash('Incorrect password.')
+            return render_template('auth/login.html'), 403  # Mot de passe incorrect
 
-        flash(error)
+        session.clear()
+        session['UserID'] = user['ID']
+        return redirect(url_for('auth.dashboard'))
 
     return render_template('auth/login.html')
 
@@ -53,7 +61,7 @@ def dashboard():
 @bp.route('/logout')
 def logout():
     # Clear any user information from the session
-    session.pop('user_id', None)
+    session.pop('UserID', None)
     session.pop('logged_in', None)
     # Redirect to login page or home page
     return redirect(url_for('auth.login'))
@@ -87,7 +95,7 @@ def create_admin():
         'SELECT * FROM User WHERE Username = ?', ('admin',)
     ).fetchone()
 
-    if user is not Nonec:
+    if user is not None:
         error = 'Admin user already exists.'
 
     if error is None:
@@ -128,3 +136,50 @@ def tarifs():
 def camera():
     # Rendre le template HTML pour la page "camera.html" dans le dossier "dashboard"
     return render_template('dashboard/camera.html')
+
+@bp.route('/create_member', methods=['POST'])
+def create_member():
+    db = get_db()
+    error = None
+
+    data = request.form
+
+    member = db.execute(
+        'SELECT * FROM Member WHERE Email = ?', (data['email'],)
+    ).fetchone()
+
+    if member is not None:
+        error = 'Member with this email already exists.'
+
+    if error is None:
+        # Insert the member into the Member table
+        db.execute(
+            'INSERT INTO Member (LastName, FirstName, Phone, Email, isPayed) VALUES (?, ?, ?, ?, ?)',
+            (data['lastName'], data['firstName'], data['phone'], data['email'], data['isPayed'] == 'yes')
+        )
+        db.commit()
+
+        # Get the ID of the newly inserted member
+        member_id = db.execute('SELECT last_insert_rowid()').fetchone()[0]
+
+        # Insert each matricule into the LicensePlate table
+        matricules = request.form.getlist('matricule[]')
+        for matricule in matricules:
+            db.execute(
+                'INSERT INTO LicensePlate (PlateNumber, MemberID) VALUES (?, ?)',
+                (matricule, member_id)
+            )
+        db.commit()
+
+        return 'Member created successfully.'
+    else:
+        return error, 400
+
+
+
+@bp.route('/members', methods=['GET'])
+def members_page():
+    db = get_db()
+    members = db.execute('SELECT * FROM Member').fetchall()
+    print(members)  # Check what is being returned by the query
+    return render_template('members.html', members=members)

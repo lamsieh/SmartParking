@@ -8,7 +8,7 @@ def create_app(test_config=None):
     # Chemin absolu fixe pour la base de données
     app.config.from_mapping(
         SECRET_KEY='dev',
-        DATABASE = r'C:\Users\Hp\Desktop\SmartParking\instance\smart_parking.sqlite',
+        DATABASE = r'C:\Users\Hp\Desktop\AIDC\S2\IOT\SmartParking\instance\smart_parking.sqlite',
     )
 
     print("Instance path:", app.instance_path)  # Afficher le chemin d'instance
