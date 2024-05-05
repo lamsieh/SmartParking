@@ -276,8 +276,7 @@
       <span class="close" onclick="closeEditModal()">&times;</span>
       <h2>Edit Member</h2>
       <!-- Form to edit member details -->
-      <form id="editForm">
-        <!-- Form fields for member details -->
+      <form id="editForm"  method="POST">
         <div class="form-row">
           <div class="form-group">
             <label for="editFirstName">First Name:</label>
@@ -298,12 +297,7 @@
             <input type="email" id="editEmail" name="editEmail" />
           </div>
         </div>
-
         <div class="form-row">
-          <div class="form-group">
-            <label for="editMatricule">Matricule:</label>
-            <input type="text" id="editMatricule" name="editMatricule" />
-          </div>
           <div class="form-group">
             <label for="editIsPayed">Is Payed:</label>
             <select id="editIsPayed" name="editIsPayed">
@@ -312,11 +306,7 @@
             </select>
           </div>
         </div>
-
-        <!-- Hidden input to store the index of the edited row -->
-        <input type="hidden" id="editRowIndex" name="editRowIndex" />
-
-        <!-- Button to submit the form -->
+        <input type="hidden" id="editMemberId" name="editMemberId" />
         <button type="submit" class="edit-member">Edit Member</button>
       </form>
     </div>
@@ -334,37 +324,11 @@
         <th>Actions</th>
       </tr>
     </thead>
-    <tbody>
-      <!-- Example data -->
-      <tr>
-        <td>John</td>
-        <td>Doe</td>
-        <td>123-456-7890</td>
-        <td>john@example.com</td>
-        <td>123456</td>
-        <td>Yes</td>
-        <td>
-          <button class="edit-btn">
-            <i class="fas fa-edit" onclick="openEditModal()"></i>
-          </button>
-          <button class="delete-btn"><i class="fas fa-trash-alt"></i></button>
-        </td>
-      </tr>
-      <tr>
-        <td>Jane</td>
-        <td>Smith</td>
-        <td>987-654-3210</td>
-        <td>jane@example.com</td>
-        <td>987654</td>
-        <td>No</td>
-        <td>
-          <button class="edit-btn">
-            <i class="fas fa-edit" onclick="openEditModal()"></i>
-          </button>
-          <button class="delete-btn"><i class="fas fa-trash-alt"></i></button>
-        </td>
-      </tr>
-      <!-- Add more rows as needed -->
+    <tbody id="members-tbody">
+      <!-- Les lignes seront insérées ici par JavaScript -->
     </tbody>
   </table>
+  
 </main>
+
+

@@ -4,15 +4,11 @@ from flask import Flask
 
 def create_app(test_config=None):
     app = Flask(__name__, instance_relative_config=True)
-
-    # Chemin absolu fixe pour la base de données
+    database_path = os.path.join(app.instance_path, 'smart_parking.sqlite')
     app.config.from_mapping(
         SECRET_KEY='dev',
-        DATABASE = r'C:\Users\Hp\Desktop\AIDC\S2\IOT\SmartParking\instance\smart_parking.sqlite',
+        DATABASE=database_path,
     )
-
-    print("Instance path:", app.instance_path)  # Afficher le chemin d'instance
-
     if test_config is None:
         app.config.from_pyfile('config.py', silent=True)
     else:
@@ -31,7 +27,6 @@ def create_app(test_config=None):
 
     from . import db
     db.init_app(app)
-
 
     from . import auth
     app.register_blueprint(auth.bp)

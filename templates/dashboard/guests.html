@@ -217,21 +217,29 @@
       </tr>
     </thead>
     <tbody>
-      <!-- Example data -->
-      <tr>
-        <td>code-1</td>
-        <td>matricule-1</td>
-        <td>02/05/2024</td>
-        <td>02/05/2024</td>
-        <td>30dh</td>
-      </tr>
-      <tr>
-        <td>code-2</td>
-        <td>matricule-2</td>
-        <td>02/05/2024</td>
-        <td>02/05/2024</td>
-        <td>30dh</td>
-      </tr>
     </tbody>
   </table>
 </main>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  fetch('/auth/guests/data')
+    .then(response => response.json())
+    .then(data => {
+      const tableBody = document.querySelector('.member-table tbody');
+      tableBody.innerHTML = '';  // Clear existing rows
+      data.forEach(guest => {
+        const row = `<tr>
+          <td>${guest.Code}</td>
+          <td>${guest.PlateNumber}</td>
+          <td>${guest.EntryDate}</td>
+          <td>${guest.ExitDate}</td>
+          <td>${guest.PriceToPay} dh</td>
+        </tr>`;
+        tableBody.innerHTML += row;
+      });
+    })
+    .catch(error => console.error('Error loading guest data:', error));
+});
+</script>
+

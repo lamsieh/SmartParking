@@ -255,9 +255,14 @@ areaChart.render();
 
 document.addEventListener("DOMContentLoaded", function () {
 
+  
+
+  
+
   document.getElementById('membersLink').addEventListener('click', function (e) {
     e.preventDefault();
     loadMembersContent();
+    loadMembersData();
   });
 
   document.getElementById('guestsLink').addEventListener('click', function (e) {
@@ -281,16 +286,192 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
 
+  
+  
 });
 
+
+
+
+
 function loadMembersContent() {
+  console.log("Loading members...");
   fetch('/auth/members')
     .then(response => response.text())
     .then(data => {
+      console.log("Data received:", data);  // Ajout pour déboguer et voir les données reçues
       document.getElementById('main-container').innerHTML = data;
     })
     .catch(error => console.error('Error:', error));
 }
+
+
+function loadMembersData() {
+    fetch('/auth/members/data')
+        .then(response => response.json())
+        .then(data => {
+            const tbody = document.getElementById('members-tbody');
+            tbody.innerHTML = '';
+            data.forEach(member => {
+                const isPayedText = member.isPayed ? 'Yes' : 'No';
+                const row = `<tr>
+                    <td>${member.FirstName}</td>
+                    <td>${member.LastName}</td>
+                    <td>${member.Phone}</td>
+                    <td>${member.Email}</td>
+                    <td>${member.Matricules || 'No plates registered'}</td>
+                    <td>${isPayedText}</td>
+                    <td>
+                        <button onclick="openEditModal(this)" class="edit-btn" data-id="${member.ID}"><i class="fas fa-edit"></i></button>
+                        <button onclick="deleteMember(this)" class="delete-btn" data-id="${member.ID}"><i class="fas fa-trash-alt"></i></button>
+
+                    </td>
+                </tr>`;
+                tbody.innerHTML += row;
+            });
+        })
+        .catch(error => {
+            console.error('Error loading member data:', error);
+            alert('Failed to load member data.');
+        });
+}
+
+function deleteMember(button) {
+  const memberId = button.getAttribute('data-id');
+  console.log('Attempting to delete member with ID:', memberId);  // Debugging output
+
+  if (!confirm('Are you sure you want to delete this member?')) {
+    return;
+  }
+
+  fetch(`/auth/delete_member/${memberId}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  })
+  .then(response => {
+    console.log('Response status:', response.status); // Debugging output
+    if (!response.ok) {
+      throw new Error(`Failed to delete member with status: ${response.status}`);
+    }
+    return response.json();
+  })
+  .then(data => {
+    if (data.error) {
+      alert(data.error);
+    } else {
+      alert('Member deleted successfully!');
+      button.closest('tr').remove();  // Remove the row from the table
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    alert('Failed to delete member: ' + error.message);
+  });
+}
+
+
+// Edit Member
+// affiche les données dans le formulaire
+function openEditModal(button) {
+  const memberId = button.getAttribute('data-id');
+  const row = button.closest('tr');
+  const cells = row.getElementsByTagName('td');
+
+  document.getElementById('editFirstName').value = cells[0].textContent.trim();
+  document.getElementById('editLastName').value = cells[1].textContent.trim();
+  document.getElementById('editPhone').value = cells[2].textContent.trim();
+  document.getElementById('editEmail').value = cells[3].textContent.trim();
+  // Adjust for 'Is Payed' select option value setup
+  document.getElementById('editIsPayed').value = cells[5].textContent.trim() === 'Yes' ? 'yes' : 'no';
+  document.getElementById('editMemberId').value = memberId;
+
+  var modal = document.getElementById('editModal');
+  modal.style.display = 'block';
+}
+
+
+function editMember() {
+  const memberId = document.getElementById('editMemberId').value;
+  const data = {
+    firstName: document.getElementById('editFirstName').value,
+    lastName: document.getElementById('editLastName').value,
+    phone: document.getElementById('editPhone').value,
+    email: document.getElementById('editEmail').value,
+    isPayed: document.getElementById('editIsPayed').value === 'yes' ? 1 : 0
+  };
+
+  fetch(`/auth/update_member/${memberId}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data)
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.status === 'error') {
+      alert(data.message);
+    } else {
+      alert('Member updated successfully!');
+      loadMembersData(); // Reload data to reflect changes
+      closeEditModal(); // Close the modal after update
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    alert('Failed to update member: ' + error.message);
+  });
+}
+
+// Ensure the edit form submission is hooked correctly
+document.getElementById('editForm').addEventListener('submit', function(event) {
+  event.preventDefault(); // Prevent the default form submission
+
+  const memberId = document.getElementById('editMemberId').value;
+  const data = {
+    firstName: document.getElementById('editFirstName').value,
+    lastName: document.getElementById('editLastName').value,
+    phone: document.getElementById('editPhone').value,
+    email: document.getElementById('editEmail').value,
+    isPayed: document.getElementById('editIsPayed').value === 'yes' ? 1 : 0
+  };
+
+  fetch(`/auth/update_member/${memberId}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data)
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.status === 'error') {
+      alert(data.message);
+    } else {
+      alert('Member updated successfully!');
+      loadMembersData(); // Reload data to reflect changes
+      closeEditModal(); // Close the modal after update
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    alert('Failed to update member: ' + error.message);
+  });
+});
+
+
+
+
+// Hook this function to your form's submit event
+document.getElementById('editForm').addEventListener('submit', function(event) {
+  event.preventDefault(); // Prevent the default form submission
+  editMember();
+});
+
+
+
 
 function loadGuestsContent() {
   fetch('/auth/guests')
@@ -350,29 +531,14 @@ function closeModal() {
   modal.style.display = "none";
 }
 
-// Fonction pour ouvrir le modal d'édition et pré-remplir les champs avec les valeurs du membre sélectionné
-function openEditModal(rowIndex) {
-  // Récupérer les valeurs du membre à partir du tableau
-  // var rowData = /* Code pour récupérer les valeurs du tableau en fonction de l'index de ligne (rowIndex) */
-
-  // // Pré-remplir les champs du formulaire avec les valeurs du membre
-  // document.getElementById("editFirstName").value = rowData.firstName;
-  // document.getElementById("editLastName").value = rowData.lastName;
-  // document.getElementById("editPhone").value = rowData.phone;
-  // document.getElementById("editEmail").value = rowData.email;
-  // document.getElementById("editIsPayed").value = rowData.isPayed;
-
-  // // Stocker l'index de ligne dans un champ caché pour référence ultérieure
-  // document.getElementById("editRowIndex").value = rowIndex;
-
-  // Ouvrir le modal d'édition
-  document.getElementById("editModal").style.display = "block";
-}
 
 
 function closeEditModal() {
   document.getElementById("editModal").style.display = "none";
 }
+
+
+
 
 
 

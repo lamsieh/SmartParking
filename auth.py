@@ -6,10 +6,9 @@ from werkzeug.security import check_password_hash, generate_password_hash
 
 from .db import get_db
 
+from flask import jsonify
+
 bp = Blueprint('auth', __name__, url_prefix='/auth')
-
-
-
 
 
 @bp.route('/login', methods=['GET', 'POST'])
@@ -45,7 +44,7 @@ def login():
     return render_template('auth/login.html')
 
 
-@bp.route('/dashboard')
+@bp.route('/dashboard', methods=['GET', 'POST'])
 def dashboard():
     if 'UserID' in session:
         user_id = session['UserID']
@@ -73,6 +72,7 @@ def login_required(view):
         if g.user is None:
             return redirect(url_for('auth.login'))
         return view(**kwargs)
+
     return wrapped_view
 
 
@@ -132,10 +132,12 @@ def tarifs():
     # Rendre le template HTML pour la page "tarifs.html" dans le dossier "dashboard"
     return render_template('dashboard/tarifs.html')
 
+
 @bp.route('/camera')
 def camera():
     # Rendre le template HTML pour la page "camera.html" dans le dossier "dashboard"
     return render_template('dashboard/camera.html')
+
 
 @bp.route('/create_member', methods=['POST'])
 def create_member():
@@ -153,10 +155,11 @@ def create_member():
 
     if error is None:
         # Insert the member into the Member table
-        db.execute(
-            'INSERT INTO Member (LastName, FirstName, Phone, Email, isPayed) VALUES (?, ?, ?, ?, ?)',
-            (data['lastName'], data['firstName'], data['phone'], data['email'], data['isPayed'] == 'yes')
-        )
+        with db:
+            db.execute(
+                'INSERT INTO Member (LastName, FirstName, Phone, Email, isPayed) VALUES (?, ?, ?, ?, ?)',
+                (data['lastName'], data['firstName'], data['phone'], data['email'], data['isPayed'] == 'yes')
+            )
         db.commit()
 
         # Get the ID of the newly inserted member
@@ -171,6 +174,83 @@ def create_member():
             )
         db.commit()
 
-        return 'Member created successfully.'
+        return render_template('dashboard/acceuil.html')
     else:
         return error, 400
+
+
+@bp.route('/members', methods=['GET'])
+def members_page():
+    db = get_db()
+    members = db.execute('SELECT * FROM Member').fetchall()
+    return render_template('dashboard/members.html', members=members)
+
+
+@bp.route('/members/data', methods=['GET'])
+def members_data():
+    db = get_db()
+    try:
+        query = """
+        SELECT Member.ID, Member.LastName, Member.FirstName, Member.Phone, Member.Email, Member.isPayed,
+        GROUP_CONCAT(LicensePlate.PlateNumber, ', ') AS Matricules
+        FROM Member
+        LEFT JOIN LicensePlate ON Member.ID = LicensePlate.MemberID
+        GROUP BY Member.ID
+        """
+        members = db.execute(query).fetchall()
+        print(members)  # Check what's being fetched
+        return jsonify([dict(member) for member in members])
+    except Exception as e:
+        print(e)  # Log any errors
+        return jsonify({'error': str(e)}), 500
+
+
+@bp.route('/guests/data', methods=['GET'])
+def guests_data():
+    db = get_db()
+    try:
+        # Join Guest, LicensePlate, and calculate price to pay
+        query = """
+        SELECT Guest.ID, Guest.Code, LicensePlate.PlateNumber, LicensePlate.EntryDate, LicensePlate.ExitDate,
+        ROUND((JULIANDAY(LicensePlate.ExitDate) - JULIANDAY(LicensePlate.EntryDate)) * 24 * Rates.Price, 2) AS PriceToPay
+        FROM Guest
+        JOIN LicensePlate ON Guest.ID = LicensePlate.GuestID
+        JOIN Rates ON JULIANDAY(LicensePlate.ExitDate) - JULIANDAY(LicensePlate.EntryDate) <= Rates.Duration
+        ORDER BY Guest.ID
+        """
+        guests = db.execute(query).fetchall()
+        return jsonify([dict(guest) for guest in guests])
+    except Exception as e:
+        print(e)  # Log any errors
+        return jsonify({'error': str(e)}), 500
+
+
+@bp.route('/delete_member/<int:member_id>', methods=['POST'])
+def delete_member(member_id):
+    db = get_db()
+    # Vérification si le membre existe
+    member = db.execute('SELECT * FROM Member WHERE ID = ?', (member_id,)).fetchone()
+    if not member:
+        return jsonify({'error': 'Member not found'}), 404
+
+    # Suppression du membre
+    db.execute('DELETE FROM Member WHERE ID = ?', (member_id,))
+    db.commit()
+    return jsonify({'success': 'Member deleted successfully'}), 200
+
+
+@bp.route('/update_member/<int:member_id>', methods=['POST'])
+def update_member(member_id):
+    db = get_db()
+    data = request.get_json()  # This should correctly parse the JSON sent from the client
+
+    try:
+        db.execute('''
+            UPDATE Member
+            SET FirstName = ?, LastName = ?, Phone = ?, Email = ?, isPayed = ?
+            WHERE ID = ?
+        ''', (data['firstName'], data['lastName'], data['phone'], data['email'], data['isPayed'], member_id))
+        db.commit()
+        return jsonify({'status': 'success', 'message': 'Member updated successfully!'})
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
