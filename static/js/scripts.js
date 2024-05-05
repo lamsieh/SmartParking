@@ -255,9 +255,14 @@ areaChart.render();
 
 document.addEventListener("DOMContentLoaded", function () {
 
+  
+
+  
+
   document.getElementById('membersLink').addEventListener('click', function (e) {
     e.preventDefault();
     loadMembersContent();
+    loadMembersData();
   });
 
   document.getElementById('guestsLink').addEventListener('click', function (e) {
@@ -281,16 +286,159 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
 
+  
+  
 });
 
+
+
+
+
 function loadMembersContent() {
+  console.log("Loading members...");
   fetch('/auth/members')
     .then(response => response.text())
     .then(data => {
+      console.log("Data received:", data);  // Ajout pour déboguer et voir les données reçues
       document.getElementById('main-container').innerHTML = data;
     })
     .catch(error => console.error('Error:', error));
 }
+
+
+function loadMembersData() {
+  fetch('/auth/members/data')
+    .then(response => response.json())
+    .then(data => {
+      const tbody = document.getElementById('members-tbody');
+      tbody.innerHTML = '';  // Effacer le contenu existant avant d'ajouter les nouveaux membres
+      data.forEach(member => {
+        const isPayedText = member.isPayed ? 'Yes' : 'No';  // Convertir 1 ou 0 en texte compréhensible
+        const row = `<tr >
+          <td>${member.FirstName}</td>
+          <td>${member.LastName}</td>
+          <td>${member.Phone}</td>
+          <td>${member.Email}</td>
+          <td>N/A</td>  <!-- Assumer qu'aucun LicensePlate n'est fourni pour l'instant -->
+          <td>${isPayedText}</td>
+          <td>
+            <button  onclick="openEditModal(this)" class="edit-btn" data-id="{{ member.ID }}"  
+            ><i class="fas fa-edit"></i></button>
+            <button class="delete-btn" data-id="${member.ID}" onclick="deleteMember(this)"><i class="fas fa-trash-alt"></i></button>
+          </td>
+        </tr>`;
+        tbody.innerHTML += row;  // Ajouter la nouvelle ligne au tableau
+      });
+    })
+    .catch(error => {
+      console.error('Error loading member data:', error);
+      alert('Failed to load member data.');
+    });
+}
+
+function deleteMember(button) {
+  const memberId = button.getAttribute('data-id');
+  if (!confirm('Are you sure you want to delete this member?')) {
+    return;
+  }
+
+  fetch(`/auth/delete_member/${memberId}`, {
+    method: 'POST'
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Failed to delete member');
+    }
+    return response.json();
+  })
+  .then(data => {
+    if (data.error) {
+      alert(data.error);
+    } else {
+      alert('Member deleted successfully!');
+      button.closest('tr').remove();  // Retire la ligne du tableau
+    }
+  })
+  .catch(error => console.error('Error:', error));
+}
+
+
+// Edit Member
+// affiche les données dans le formulaire
+function openEditModal(button) {
+  const memberId = button.getAttribute('data-id'); 
+  const row = button.closest('tr');
+  const cells = row.getElementsByTagName('td');
+
+  document.getElementById('editFirstName').value = cells[0].textContent.trim();
+  document.getElementById('editLastName').value = cells[1].textContent.trim();
+  document.getElementById('editPhone').value = cells[2].textContent.trim();
+  document.getElementById('editEmail').value = cells[3].textContent.trim();
+  document.getElementById('editIsPayed').value = cells[4].textContent.trim() === 'Yes' ? 'yes' : 'no';
+  document.getElementById('editMemberId').value = memberId;
+
+
+
+  var modal = document.getElementById('editModal');
+  modal.style.display = 'block';
+}
+
+function editMember() {
+  const memberId = document.getElementById('editMemberId').value;
+  const firstName = document.getElementById('editFirstName').value;
+  const lastName = document.getElementById('editLastName').value;
+  const phone = document.getElementById('editPhone').value;
+  const email = document.getElementById('editEmail').value;
+  const isPayed = document.getElementById('editIsPayed').value === 'yes' ? 1 : 0;
+
+  fetch(`/auth/update_member/${memberId}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      firstName,
+      lastName,
+      phone,
+      email,
+      isPayed
+    })
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Failed to edit member');
+    }
+    return response.json();
+  })
+  .then(data => {
+    if (data.error) {
+      alert(data.error);
+    } else {
+      alert('Member edited successfully!');
+      loadMembersData();
+      closeEditModal();
+    }
+  })
+  .catch(error => console.error('Error:', error));
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 function loadGuestsContent() {
   fetch('/auth/guests')
@@ -350,29 +498,14 @@ function closeModal() {
   modal.style.display = "none";
 }
 
-// Fonction pour ouvrir le modal d'édition et pré-remplir les champs avec les valeurs du membre sélectionné
-function openEditModal(rowIndex) {
-  // Récupérer les valeurs du membre à partir du tableau
-  // var rowData = /* Code pour récupérer les valeurs du tableau en fonction de l'index de ligne (rowIndex) */
-
-  // // Pré-remplir les champs du formulaire avec les valeurs du membre
-  // document.getElementById("editFirstName").value = rowData.firstName;
-  // document.getElementById("editLastName").value = rowData.lastName;
-  // document.getElementById("editPhone").value = rowData.phone;
-  // document.getElementById("editEmail").value = rowData.email;
-  // document.getElementById("editIsPayed").value = rowData.isPayed;
-
-  // // Stocker l'index de ligne dans un champ caché pour référence ultérieure
-  // document.getElementById("editRowIndex").value = rowIndex;
-
-  // Ouvrir le modal d'édition
-  document.getElementById("editModal").style.display = "block";
-}
 
 
 function closeEditModal() {
   document.getElementById("editModal").style.display = "none";
 }
+
+
+
 
 
 

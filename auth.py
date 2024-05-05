@@ -6,6 +6,10 @@ from werkzeug.security import check_password_hash, generate_password_hash
 
 from .db import get_db
 
+import sqlite3
+
+from flask import jsonify
+
 bp = Blueprint('auth', __name__, url_prefix='/auth')
 
 
@@ -174,6 +178,8 @@ def create_member():
         return 'Member created successfully.'
     else:
         return error, 400
+    
+
 
 
 
@@ -181,5 +187,52 @@ def create_member():
 def members_page():
     db = get_db()
     members = db.execute('SELECT * FROM Member').fetchall()
-    print(members)  # Check what is being returned by the query
-    return render_template('members.html', members=members)
+    return render_template('dashboard/members.html', members=members)
+
+@bp.route('/members/data', methods=['GET'])
+def members_data():
+    db = get_db()
+    members = db.execute('SELECT * FROM Member').fetchall()
+    return jsonify([dict(member) for member in members])
+
+
+@bp.route('/delete_member/<int:member_id>', methods=['POST'])
+def delete_member(member_id):
+    db = get_db()
+    # Vérification si le membre existe
+    member = db.execute('SELECT * FROM Member WHERE ID = ?', (member_id,)).fetchone()
+    if not member:
+        return jsonify({'error': 'Member not found'}), 404
+
+    # Suppression du membre
+    db.execute('DELETE FROM Member WHERE ID = ?', (member_id,))
+    db.commit()
+    return jsonify({'success': 'Member deleted successfully'}), 200
+
+@bp.route('/update_member/<int:member_id>', methods=['POST'])
+def update_member(member_id):
+    db = get_db()
+
+    # Retrieve fields from the form data
+    firstName = request.form.get('editFirstName', '').strip()
+    lastName = request.form.get('editLastName', '').strip()
+    phone = request.form.get('editPhone', '').strip()
+    email = request.form.get('editEmail', '').strip()
+    isPayed = request.form.get('editIsPayed', 'no').strip().lower() == 'yes'
+
+    # Basic validation for required fields
+    # if not all([firstName, lastName, phone, email]):
+    #     return jsonify({'status': 'error', 'message': 'All fields are required except isPayed'}), 400
+
+    # Perform the update operation
+    try:
+        db.execute('''
+            UPDATE Member
+            SET FirstName = ?, LastName = ?, Phone = ?, Email = ?, isPayed = ?
+            WHERE ID = ?
+        ''', (firstName, lastName, phone, email, isPayed, member_id))
+        db.commit()
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': f'An error occurred during update: {str(e)}'}), 500
+
+    return jsonify({'status': 'success', 'message': 'Member updated successfully!'})
