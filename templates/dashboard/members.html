@@ -334,23 +334,37 @@
         <th>Actions</th>
       </tr>
     </thead>
-<tbody>
-  {% for member in members %}
-  <tr>
-    <td>{{ member.FirstName }}</td>
-    <td>{{ member.LastName }}</td>
-    <td>{{ member.Phone }}</td>
-    <td>{{ member.Email }}</td>
-    <td>{{ member.LicensePlate }}</td>
-    <td>{{ member.isPayed }}</td>
-    <td>
-      <button class="edit-btn">
-        <i class="fas fa-edit" onclick="openEditModal()"></i>
-      </button>
-      <button class="delete-btn"><i class="fas fa-trash-alt"></i></button>
-    </td>
-  </tr>
-  {% endfor %}
-</tbody>
+    <tbody>
+      <!-- Example data -->
+      <tr>
+        <td>John</td>
+        <td>Doe</td>
+        <td>123-456-7890</td>
+        <td>john@example.com</td>
+        <td>123456</td>
+        <td>Yes</td>
+        <td>
+          <button class="edit-btn">
+            <i class="fas fa-edit" onclick="openEditModal()"></i>
+          </button>
+          <button class="delete-btn"><i class="fas fa-trash-alt"></i></button>
+        </td>
+      </tr>
+      <tr>
+        <td>Jane</td>
+        <td>Smith</td>
+        <td>987-654-3210</td>
+        <td>jane@example.com</td>
+        <td>987654</td>
+        <td>No</td>
+        <td>
+          <button class="edit-btn">
+            <i class="fas fa-edit" onclick="openEditModal()"></i>
+          </button>
+          <button class="delete-btn"><i class="fas fa-trash-alt"></i></button>
+        </td>
+      </tr>
+      <!-- Add more rows as needed -->
+    </tbody>
   </table>
 </main>

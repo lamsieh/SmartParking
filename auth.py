@@ -174,12 +174,3 @@ def create_member():
         return 'Member created successfully.'
     else:
         return error, 400
-
-
-
-@bp.route('/members', methods=['GET'])
-def members_page():
-    db = get_db()
-    members = db.execute('SELECT * FROM Member').fetchall()
-    print(members)  # Check what is being returned by the query
-    return render_template('members.html', members=members)
