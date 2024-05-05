@@ -268,6 +268,7 @@ document.addEventListener("DOMContentLoaded", function () {
   document.getElementById('guestsLink').addEventListener('click', function (e) {
     e.preventDefault();
     loadGuestsContent();
+    loadGuestsData();
   });
 
   document.getElementById('parkingLink').addEventListener('click', function (e) {
@@ -305,6 +306,39 @@ function loadMembersContent() {
     .catch(error => console.error('Error:', error));
 }
 
+function loadGuestsContent() {
+  console.log("Loading guests...");
+  fetch('/auth/guests')
+    .then(response => response.text())
+    .then(data => {
+      console.log("Data received:", data);  // Ajout pour déboguer et voir les données reçues
+      document.getElementById('main-container').innerHTML = data;
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+function loadGuestsData() {
+    fetch('/auth/guests/data')
+        .then(response => response.json())
+        .then(data => {
+            const tbody = document.getElementById('guests-tbody');
+            tbody.innerHTML = ''; // Clear previous data
+            data.forEach(guest => {
+                const row = `<tr>
+                     <td>${guest.Code}</td>
+                     <td>${guest.PlateNumber}</td>
+                     <td>${guest.EntryDate}</td>
+                     <td>${guest.ExitDate}</td>
+                     <td>${guest.PriceToPay}</td>
+                </tr>`;
+                tbody.innerHTML += row;
+            });
+        })
+        .catch(error => {
+            console.error('Error loading guest data:', error);
+            alert('Failed to load guest data.');
+        });
+}
 
 function loadMembersData() {
     fetch('/auth/members/data')
@@ -470,20 +504,6 @@ document.getElementById('editForm').addEventListener('submit', function(event) {
   editMember();
 });
 
-
-
-
-function loadGuestsContent() {
-  fetch('/auth/guests')
-    .then(response => response.text())
-    .then((data) => {
-      document.getElementById('main-container').innerHTML = data;
-    })
-    .catch((error) => {
-      console.error('Error:', error);
-    });
-}
-
 function loadParkingContent() {
   fetch('/auth/parking')
     .then(response => response.text())
@@ -536,6 +556,7 @@ function closeModal() {
 function closeEditModal() {
   document.getElementById("editModal").style.display = "none";
 }
+
 
 
 

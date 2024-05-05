@@ -216,30 +216,8 @@
         <th>PriceToPay</th>
       </tr>
     </thead>
-    <tbody>
+    <tbody id="guests-tbody">
+    <!-- Les lignes seront insérées ici par JavaScript -->
     </tbody>
   </table>
 </main>
-
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-  fetch('/auth/guests/data')
-    .then(response => response.json())
-    .then(data => {
-      const tableBody = document.querySelector('.member-table tbody');
-      tableBody.innerHTML = '';  // Clear existing rows
-      data.forEach(guest => {
-        const row = `<tr>
-          <td>${guest.Code}</td>
-          <td>${guest.PlateNumber}</td>
-          <td>${guest.EntryDate}</td>
-          <td>${guest.ExitDate}</td>
-          <td>${guest.PriceToPay} dh</td>
-        </tr>`;
-        tableBody.innerHTML += row;
-      });
-    })
-    .catch(error => console.error('Error loading guest data:', error));
-});
-</script>
-

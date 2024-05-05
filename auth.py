@@ -185,6 +185,11 @@ def members_page():
     members = db.execute('SELECT * FROM Member').fetchall()
     return render_template('dashboard/members.html', members=members)
 
+@bp.route('/guests', methods=['GET'])
+def guests_page():
+    db = get_db()
+    guests = db.execute('SELECT * FROM Guest').fetchall()
+    return render_template('dashboard/guests.html', guests=guests)
 
 @bp.route('/members/data', methods=['GET'])
 def members_data():
@@ -209,16 +214,14 @@ def members_data():
 def guests_data():
     db = get_db()
     try:
-        # Join Guest, LicensePlate, and calculate price to pay
         query = """
-        SELECT Guest.ID, Guest.Code, LicensePlate.PlateNumber, LicensePlate.EntryDate, LicensePlate.ExitDate,
-        ROUND((JULIANDAY(LicensePlate.ExitDate) - JULIANDAY(LicensePlate.EntryDate)) * 24 * Rates.Price, 2) AS PriceToPay
+        SELECT Guest.ID, Guest.Code, Guest.PriceToPay, LicensePlate.PlateNumber, LicensePlate.EntryDate, LicensePlate.ExitDate
         FROM Guest
         JOIN LicensePlate ON Guest.ID = LicensePlate.GuestID
-        JOIN Rates ON JULIANDAY(LicensePlate.ExitDate) - JULIANDAY(LicensePlate.EntryDate) <= Rates.Duration
-        ORDER BY Guest.ID
+        GROUP BY Guest.ID
         """
         guests = db.execute(query).fetchall()
+        print(guests)
         return jsonify([dict(guest) for guest in guests])
     except Exception as e:
         print(e)  # Log any errors
