@@ -31,6 +31,9 @@ def create_app(test_config=None):
     from . import auth
     app.register_blueprint(auth.bp)
 
+    from . import models
+    app.register_blueprint(models.bp)
+
     @app.route('/hello')
     def hello():
         return 'Hello, World!'

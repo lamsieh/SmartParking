@@ -210,6 +210,28 @@ def members_data():
         return jsonify({'error': str(e)}), 500
 
 
+@bp.route('/tarifs', methods=['GET'])
+def tarifs_page():
+    db = get_db()
+    tarifs = db.execute('SELECT * FROM Rates').fetchall()
+    return render_template('dashboard/tarifs.html', tarifs=tarifs)
+
+@bp.route('/tarifs/data', methods=['GET'])
+def tarifs_data():
+    db = get_db()
+    try:
+        query = """
+        SELECT * FROM Rates
+        """
+        tarifs = db.execute(query).fetchall()
+        print(tarifs)  # Check what's being fetched
+        return jsonify([dict(tarif) for tarif in tarifs])
+    except Exception as e:
+        print(e)  # Log any errors
+        return jsonify({'error': str(e)}), 500
+
+
+
 @bp.route('/guests/data', methods=['GET'])
 def guests_data():
     db = get_db()

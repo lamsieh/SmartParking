@@ -279,6 +279,7 @@ document.addEventListener("DOMContentLoaded", function () {
   document.getElementById('tarifsLink').addEventListener('click', function (e) {
     e.preventDefault();
     loadTarifsContent();
+    loadTarifsData();
   });
 
   document.getElementById('cameraLink').addEventListener('click', function (e) {
@@ -515,6 +516,27 @@ function loadParkingContent() {
     });
 
 }
+
+function loadTarifsData() {
+    fetch('/auth/tarifs/data')
+        .then(response => response.json())
+        .then(data => {
+            const tbody = document.getElementById('tarifs-tbody');
+            tbody.innerHTML = '';
+            data.forEach(tarif => {
+                const row = `<tr>
+                    <td>${(tarif.Duration)}H</td>
+                    <td>${(tarif.Price)}DH</td>
+                </tr>`;
+                tbody.innerHTML += row;
+            });
+        })
+        .catch(error => {
+            console.error('Error loading tarif data:', error);
+            alert('Failed to load tarif data.');
+        });
+}
+
 
 function loadTarifsContent() {
   fetch('/auth/tarifs')
