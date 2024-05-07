@@ -35,7 +35,7 @@ def car_detected():
     number_plate = detect_license_plate_from_ip('192.168.19.67')
         
 
-    pattern = r"\b\d(?:\s\d){3}\b"
+
 
     
     return jsonify({

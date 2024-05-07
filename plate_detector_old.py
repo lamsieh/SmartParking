@@ -51,9 +51,9 @@ def detect_license_plate_from_ip(ip_address):
             if len(detection) > 0:
                 license_plate_text = detection[0][1]  # Stockage du texte extrait de la plaque
 
-                print("Plaque d'immatriculation détectée:", license_plate_text)
+                if re.match(r'\b\d{4}\b', license_plate_text):
+                    return license_plate_text
 
-                return license_plate_text
                 
                 # text = f"{license_plate_text} {detection[0][2] * 100:.2f}%"
                 # cv2.drawContours(frame, [plate_cnt], -1, (0, 255, 0), 3)
