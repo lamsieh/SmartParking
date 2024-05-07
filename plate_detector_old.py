@@ -1,6 +1,6 @@
 import cv2
 from easyocr import Reader
-
+import re
 def detect_license_plate(frame):
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     blur = cv2.GaussianBlur(gray, (5, 5), 0)
@@ -26,9 +26,9 @@ def detect_license_plate_from_ip(ip_address):
     cap = cv2.VideoCapture(f'http://{ip_address}:8080/video')
 
     # Définir la résolution et le nombre d'images par seconde
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 480)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
-    cap.set(cv2.CAP_PROP_FPS, 15)
+    cap.set(cv2.CAP_PROP_FPS, 10)
 
     while True:
         ret, frame = cap.read()
@@ -50,21 +50,13 @@ def detect_license_plate_from_ip(ip_address):
             detection = reader.readtext(plate)
             if len(detection) > 0:
                 license_plate_text = detection[0][1]  # Stockage du texte extrait de la plaque
+
                 print("Plaque d'immatriculation détectée:", license_plate_text)
 
-                text = f"{license_plate_text} {detection[0][2] * 100:.2f}%"
-                cv2.drawContours(frame, [plate_cnt], -1, (0, 255, 0), 3)
-                cv2.putText(frame, text, (x, y - 20), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 0), 2)
+                return license_plate_text
+                
+                # text = f"{license_plate_text} {detection[0][2] * 100:.2f}%"
+                # cv2.drawContours(frame, [plate_cnt], -1, (0, 255, 0), 3)
+                # cv2.putText(frame, text, (x, y - 20), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 0), 2)
 
-        # Affichage de la vidéo avec les détections
-        cv2.imshow('License Plate Detection', frame)
 
-        # Arrêt du programme lorsque la touche 'q' est pressée
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
-
-    # Libération des ressources et fermeture des fenêtres
-    cap.release()
-    cv2.destroyAllWindows()
-
-detect_license_plate_from_ip('192.168.19.67')

@@ -1,7 +1,11 @@
 import cv2
-from constants import ARDUINO, IP
 import numpy as np
 import serial
+
+
+ARDUINO = 'Arduino'
+IP = 'IP'
+
 
 class CameraManager:
     def __init__(self, camera_type, **kwargs):

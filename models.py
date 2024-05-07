@@ -1,24 +1,18 @@
 from flask import Flask, jsonify, Blueprint, app
+import re
 import time  # Pour simuler un délai dans la boucle while
+from .camera_manager import  CameraManager
+from .plate_detector_old import  detect_license_plate_from_ip
+import cv2
 
+ARDUINO = 'Arduino'
+IP = 'IP'
 
 bp = Blueprint('models', __name__, url_prefix='/models')
 
 
 
-class CameraManage:
-    def __init__(self):
-        # Initialisation de la caméra ou autre logique nécessaire
-        pass
 
-    def capture(self):
-        # Simuler la capture d'une image de la caméra
-        return "image_frame"
-
-
-def detect_plate(frame):
-    # Simuler la détection d'une plaque
-    return '9345'
 
 
 def detect_parking(frame):
@@ -33,23 +27,18 @@ def detect_parking(frame):
     }
 
 
-@app.route('/car-detected', methods=['GET'])
+@bp.route('/car-detected', methods=['GET'])
 def car_detected():
-    camera = CameraManage()
+    camera = CameraManager(camera_type=IP, ip_address="http://192.168.19.67:8080/video")
     number_plate = ""
-    attempts = 0  # Compteur pour éviter une boucle infinie
-    while number_plate == "" and attempts < 8:
-        frame = camera.capture()
-        number_plate = detect_plate(frame)
-        time.sleep(1)  # Pause pour simuler le temps de traitement
-        attempts += 1
 
-    if number_plate:
-        parking_status = detect_parking(frame)
-        return jsonify({
-            "number_plate": number_plate,
-            "parking_status": parking_status
-        })
-    else:
-        return jsonify({"error": "No plate detected"}), 404
+    number_plate = detect_license_plate_from_ip('192.168.19.67')
+        
+
+    pattern = r"\b\d(?:\s\d){3}\b"
+
+    
+    return jsonify({
+        "number_plate": number_plate,
+    })
 
